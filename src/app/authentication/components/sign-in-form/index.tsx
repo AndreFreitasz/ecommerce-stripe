@@ -23,8 +23,12 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { signInFormSchema, SignInFormValues } from "./sign-in-form.schema";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const SignInForm = () => {
+  const router = useRouter();
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -33,8 +37,23 @@ const SignInForm = () => {
     },
   });
 
-  const onSubmit = (values: SignInFormValues) => {
-    console.log("Form submitted:", values);
+  const onSubmit = async (values: SignInFormValues) => {
+    await authClient.signIn.email({
+      email: values.email,
+      password: values.password,
+      fetchOptions: {
+        onSuccess: () => {
+         router.push("/");
+        },
+        onError: (error) => {
+          if (error.error.code === "INVALID_EMAIL_OR_PASSWORD") {
+            toast.error("Email ou senha inválidos.");
+            return;
+          }
+          toast.error("Ocorreu um erro ao tentar entrar.");
+        },
+      },
+    });
   };
 
   return (
