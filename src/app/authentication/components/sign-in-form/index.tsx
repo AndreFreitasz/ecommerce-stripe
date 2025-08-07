@@ -1,7 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,11 +23,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 
 import { signInFormSchema, SignInFormValues } from "./sign-in-form.schema";
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 const SignInForm = () => {
   const router = useRouter();
@@ -43,7 +43,7 @@ const SignInForm = () => {
       password: values.password,
       fetchOptions: {
         onSuccess: () => {
-         router.push("/");
+          router.push("/");
         },
         onError: (error) => {
           if (error.error.code === "INVALID_EMAIL_OR_PASSWORD") {
